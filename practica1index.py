@@ -86,8 +86,8 @@ class MyIndex:
         langauge_analyzer = MyAnalyzer(lang="es", expression=r"\w+")
         schema = Schema(path=ID(stored=True),
                         fecha_modificacion=STORED,
-                        title=TEXT,
-                        description=TEXT,
+                        title=TEXT(analyzer=langauge_analyzer),
+                        description=TEXT(analyzer=langauge_analyzer),
                         autor=TEXT,
                         director=TEXT,
                         departamento=TEXT,

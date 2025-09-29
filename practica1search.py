@@ -13,12 +13,12 @@ import sys
 from whoosh.qparser import QueryParser
 from whoosh.qparser import OrGroup
 from whoosh import scoring
+from practica1index import MyStemmingFilter
 import whoosh.index as index
 
 class MySearcher:
-    def __init__(self, index_folder, show_info, model_type = 'tfidf'):
+    def __init__(self, index_folder, model_type = 'tfidf'):
         ix = index.open_dir(index_folder)
-        self.show_info = show_info
         if model_type == 'tfidf':
             # Apply a vector retrieval model as default
             self.searcher = ix.searcher(weighting=scoring.TF_IDF())
@@ -30,26 +30,29 @@ class MySearcher:
     def search(self, query_text):
         query = self.parser.parse(query_text)
         results = self.searcher.search(query)
-        print('Returned documents:')
+        if not output_file:
+            print('Returned documents:')
         i = 1
         for result in results:
             print(f'{i} - File path: {result.get("path")}, Similarity score: {result.score}')
-            if (self.show_info): print(f'Modified: {result.get("fecha_modificacion")}')
             i += 1
 
 if __name__ == '__main__':
-    index_folder = '../whooshindex'
+    index_folder = './recordsdcindex'
     i = 1
-    show_info = False
+    output_file = False
     while (i < len(sys.argv)):
         if sys.argv[i] == '-index':
             index_folder = sys.argv[i+1]
             i = i + 1
-        elif sys.argv[i] == '-info':
-            show_info = True
+        elif sys.argv[i] == '-infoNeeds':
+            sys.stdin = open(sys.argv[i+1], "r")
+        elif sys.argv[i] == '-output':
+            output_file = True
+            sys.stdout = open(sys.argv[i+1], "w")
         i = i + 1
 
-    searcher = MySearcher(index_folder, show_info)
+    searcher = MySearcher(index_folder)
 
     #query = 'System engineering'
     query = input('Introduce a query: ')

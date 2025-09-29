@@ -1,0 +1,9 @@
+Introduce a query: 1 - File path: oai_zaguan.unizar.es_32244.xml, Similarity score: 35.182403242208416
+2 - File path: oai_zaguan.unizar.es_76549.xml, Similarity score: 35.182403242208416
+3 - File path: oai_zaguan.unizar.es_48119.xml, Similarity score: 17.591201621104208
+4 - File path: oai_zaguan.unizar.es_58559.xml, Similarity score: 17.591201621104208
+5 - File path: oai_zaguan.unizar.es_13371.xml, Similarity score: 8.795600810552104
+6 - File path: oai_zaguan.unizar.es_31927.xml, Similarity score: 8.795600810552104
+7 - File path: oai_zaguan.unizar.es_64217.xml, Similarity score: 8.795600810552104
+8 - File path: oai_zaguan.unizar.es_94879.xml, Similarity score: 8.795600810552104
+Introduce a query ('q' for exit): 
