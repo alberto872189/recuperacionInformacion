@@ -127,6 +127,17 @@ class MyIndex:
         text = ' '.join(line.strip() for line in raw_text.splitlines() if line)
         # print(text)
 
+        
+        # Obtener el diccionario de namespaces
+        namespaces = dict([
+            node for _, node in ET.iterparse(file_path, events=['start-ns'])
+        ])
+
+        # Mostrar la URI asociada al prefijo 'dc'
+        dc_uri = namespaces.get('dc')
+
+
+        id = ""
         title = ""
         description = ""
         autor = ""
@@ -134,23 +145,25 @@ class MyIndex:
         fecha = ""
         departamento = ""
         for child in root:
-            if child.tag == '{http://www.openarchives.org/OAI/2.0/oai_dc/}title':
+            if child.tag == f'{{{dc_uri}}}identifier':
+                if child.text: id += child.text
+            if child.tag == f'{{{dc_uri}}}title':
                 if child.text: title += child.text
-            if child.tag == '{http://www.openarchives.org/OAI/2.0/oai_dc/}description':
+            if child.tag == f'{{{dc_uri}}}description':
                 if child.text: description += child.text
-            if child.tag == '{http://www.openarchives.org/OAI/2.0/oai_dc/}creator':
+            if child.tag == f'{{{dc_uri}}}creator':
                 if child.text: autor += child.text
-            if child.tag == '{http://www.openarchives.org/OAI/2.0/oai_dc/}contributor':
+            if child.tag == f'{{{dc_uri}}}contributor':
                 if child.text: director += child.text
-            if child.tag == '{http://www.openarchives.org/OAI/2.0/oai_dc/}creator':
+            if child.tag == f'{{{dc_uri}}}creator':
                 if child.text: autor += child.text
-            if child.tag == '{http://www.openarchives.org/OAI/2.0/oai_dc/}date':
+            if child.tag == f'{{{dc_uri}}}date':
                 if child.text: fecha += child.text
-            if child.tag == '{http://www.openarchives.org/OAI/2.0/oai_dc/}publisher':
+            if child.tag == f'{{{dc_uri}}}publisher':
                 if child.text: departamento += child.text
             
 
-        self.writer.add_document(path=filename,
+        self.writer.add_document(path=id,
                                  fecha_modificacion=datetime.datetime.fromtimestamp(os.path.getmtime(file_path)).strftime('%Y-%m-%d %H:%M:%S'),
                                  title=title,
                                  description=description,

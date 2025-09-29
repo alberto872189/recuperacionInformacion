@@ -29,33 +29,47 @@ class MySearcher:
 
     def search(self, query_text):
         query = self.parser.parse(query_text)
-        results = self.searcher.search(query)
+        results = self.searcher.search(query, limit=100)
         if not output_file:
             print('Returned documents:')
         i = 1
         for result in results:
-            print(f'{i} - File path: {result.get("path")}, Similarity score: {result.score}')
+            if output_file:
+                output.write(f'{i}\t{result.get("path")}\n')
+            else:
+                print(f'{i}\t{result.get("path")}')
             i += 1
 
 if __name__ == '__main__':
     index_folder = './recordsdcindex'
     i = 1
+    imput_file = False
     output_file = False
     while (i < len(sys.argv)):
         if sys.argv[i] == '-index':
             index_folder = sys.argv[i+1]
             i = i + 1
         elif sys.argv[i] == '-infoNeeds':
+            imput_file = True
             sys.stdin = open(sys.argv[i+1], "r")
         elif sys.argv[i] == '-output':
             output_file = True
-            sys.stdout = open(sys.argv[i+1], "w")
+            output = open(sys.argv[i+1], "w")
         i = i + 1
 
     searcher = MySearcher(index_folder)
 
     #query = 'System engineering'
-    query = input('Introduce a query: ')
+    if imput_file:
+        query = sys.stdin.readline().strip()  
+    else:
+        query = input('Introduce a query: ')
     while query != 'q':
         searcher.search(query)
-        query = input('Introduce a query (\'q\' for exit): ')
+        if imput_file:
+            query = sys.stdin.readline().strip()
+            if query == '':
+                break
+        else:
+            query = input('Introduce a query (\'q\' for exit): ')
+    output.close() if output_file else None
