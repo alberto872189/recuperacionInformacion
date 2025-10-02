@@ -25,7 +25,7 @@ class MySearcher:
         else:
             # Apply the probabilistic BM25F model, the default model in searcher method
             self.searcher = ix.searcher()
-        fields = ["autor", "director", "departamento", "title", "descripcion", "subject", "fecha"]
+        fields = ["autor", "director", "departamento", "title", "description", "subject", "fecha"]
         self.parser = MultifieldParser(fields, schema=ix.schema, group=OrGroup)
 
     def search(self, query_text, output_file=None):
