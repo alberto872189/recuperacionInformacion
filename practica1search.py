@@ -10,7 +10,7 @@ Usage: python search.py -index <index folder>
 
 import sys
 
-from whoosh.qparser import QueryParser
+from whoosh.qparser import QueryParser, MultifieldParser
 from whoosh.qparser import OrGroup
 from whoosh import scoring
 from practica1index import MyStemmingFilter
@@ -25,9 +25,10 @@ class MySearcher:
         else:
             # Apply the probabilistic BM25F model, the default model in searcher method
             self.searcher = ix.searcher()
-        self.parser = QueryParser("content", ix.schema, group = OrGroup)
+        fields = ["autor", "director", "departamento", "title", "descripcion", "subject", "fecha"]
+        self.parser = MultifieldParser(fields, schema=ix.schema, group=OrGroup)
 
-    def search(self, query_text):
+    def search(self, query_text, output_file=None):
         query = self.parser.parse(query_text)
         results = self.searcher.search(query, limit=100)
         if not output_file:
@@ -40,36 +41,43 @@ class MySearcher:
                 print(f'{i}\t{result.get("path")}')
             i += 1
 
+
 if __name__ == '__main__':
     index_folder = './recordsdcindex'
+    input_file = None
+    output_file = None
+    output = None
+
     i = 1
-    imput_file = False
-    output_file = False
-    while (i < len(sys.argv)):
+    while i < len(sys.argv):
         if sys.argv[i] == '-index':
-            index_folder = sys.argv[i+1]
-            i = i + 1
+            index_folder = sys.argv[i + 1]
+            i += 1
         elif sys.argv[i] == '-infoNeeds':
-            imput_file = True
-            sys.stdin = open(sys.argv[i+1], "r")
+            input_file = sys.argv[i + 1]
+            sys.stdin = open(input_file, "r")
+            i += 1
         elif sys.argv[i] == '-output':
-            output_file = True
-            output = open(sys.argv[i+1], "w")
-        i = i + 1
+            output_file = sys.argv[i + 1]
+            output = open(output_file, "w")
+            i += 1
+        i += 1
 
     searcher = MySearcher(index_folder)
 
-    #query = 'System engineering'
-    if imput_file:
-        query = sys.stdin.readline().strip()  
+    if input_file:
+        query = sys.stdin.readline().strip()
     else:
-        query = input('Introduce a query: ')
+        query = input("Introduce a query: ")
+
     while query != 'q':
-        searcher.search(query)
-        if imput_file:
+        searcher.search(query, output_file=output)
+        if input_file:
             query = sys.stdin.readline().strip()
             if query == '':
                 break
         else:
-            query = input('Introduce a query (\'q\' for exit): ')
-    output.close() if output_file else None
+            query = input("Introduce a query ('q' for exit): ")
+
+    if output:
+        output.close()

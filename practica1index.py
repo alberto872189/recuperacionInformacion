@@ -85,14 +85,13 @@ class MyIndex:
     def __init__(self,index_folder):
         langauge_analyzer = MyAnalyzer(lang="es", expression=r"\w+")
         schema = Schema(path=ID(stored=True),
-                        fecha_modificacion=STORED,
                         title=TEXT(analyzer=langauge_analyzer),
                         description=TEXT(analyzer=langauge_analyzer),
-                        autor=TEXT,
-                        director=TEXT,
-                        departamento=TEXT,
-                        fecha=TEXT,
-                        content=TEXT(analyzer=langauge_analyzer))
+                        autor=TEXT(analyzer=langauge_analyzer),
+                        director=TEXT(analyzer=langauge_analyzer),
+                        departamento=TEXT(analyzer=langauge_analyzer),
+                        subject=TEXT(analyzer=langauge_analyzer),
+                        fecha=TEXT(analyzer=langauge_analyzer))
         create_folder(index_folder)
         index = create_in(index_folder, schema)
         self.writer = index.writer()
@@ -103,19 +102,7 @@ class MyIndex:
                 # print(file)
                 if file.endswith('.xml'):
                     self.index_xml_doc(docs_folder, file)
-                elif file.endswith('.txt'):
-                    self.index_txt_doc(docs_folder, file)
         self.writer.commit()
-
-    def index_txt_doc(self, foldername,filename):
-        file_path = os.path.join(foldername, filename)
-        # print(file_path)
-        with open(file_path) as fp:
-            text = ' '.join(line for line in fp if line)
-        # print(text)
-        self.writer.add_document(path=filename,
-                                 fecha_modificacion=datetime.datetime.fromtimestamp(os.path.getmtime(file_path)).strftime('%Y-%m-%d %H:%M:%S'),
-                                 content=text)
 
     def index_xml_doc(self, foldername, filename):
         file_path = os.path.join(foldername, filename)
@@ -143,6 +130,7 @@ class MyIndex:
         autor = ""
         director = ""
         fecha = ""
+        subject = ""
         departamento = ""
         for child in root:
             if child.tag == f'{{{dc_uri}}}identifier':
@@ -161,17 +149,18 @@ class MyIndex:
                 if child.text: fecha += child.text
             if child.tag == f'{{{dc_uri}}}publisher':
                 if child.text: departamento += child.text
+            if child.tag == f'{{{dc_uri}}}subject':
+                if child.text: subject += child.text
             
 
         self.writer.add_document(path=id,
-                                 fecha_modificacion=datetime.datetime.fromtimestamp(os.path.getmtime(file_path)).strftime('%Y-%m-%d %H:%M:%S'),
                                  title=title,
                                  description=description,
                                  autor=autor,
                                  director=director,
+                                 subject=subject,
                                  fecha=fecha,
-                                 departamento=departamento,
-                                 content=text)
+                                 departamento=departamento,)
 
 if __name__ == '__main__':
 
