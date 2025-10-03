@@ -135,8 +135,12 @@ class MyIndex:
         for child in root:
             if child.tag == f'{{{dc_uri}}}identifier':
                 if child.text: id += child.text
-            if child.tag == f'{{{dc_uri}}}title':
-                if child.text: title += child.text
+            if child.tag == f'{{{dc_uri}}}title':    
+                lang = child.attrib.get('{http://www.w3.org/XML/1998/namespace}lang')
+                # Aceptar si el idioma no es inglés o si no se especifica
+                if (lang is None or not lang.startswith('en')) and child.text:
+                    title += child.text
+
             if child.tag == f'{{{dc_uri}}}description':
                 if child.text: description += child.text
             if child.tag == f'{{{dc_uri}}}creator':
