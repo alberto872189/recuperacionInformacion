@@ -55,7 +55,7 @@ if __name__ == '__main__':
             i += 1
         elif sys.argv[i] == '-infoNeeds':
             input_file = sys.argv[i + 1]
-            sys.stdin = open(input_file, "r")
+            sys.stdin = open(input_file, "r", encoding="utf-8")
             i += 1
         elif sys.argv[i] == '-output':
             output_file = sys.argv[i + 1]
