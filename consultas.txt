@@ -1,4 +1,7 @@
 autor:Lázaro director:Nicolás departamento:Derecho title:fraude description:contratación subject:recursos fecha:2016
 autor:Lázaro AND director:Nicolás AND departamento:Derecho AND title:fraude AND description:contratación AND subject:recursos AND fecha:2016
 Lázaro Nicolás Derecho fraude contratación recursos 2016
-
+La Irregularidad y el Fraude de Ley en la contratación temporal
+title:La Irregularidad y el Fraude de Ley en la contratación temporal
+description:"Este trabajo pretende abordar el análisis y la diferenciación de las distintas transgresiones contractuales, mediante el estudio de sentencias y doctrina jurisprudencial, conocidas como irregularidad, abuso del derecho y fraude de Ley, que se dan en las diferentes modalidades de contratación temporal, y en concreto, del contrato por obra o servicio determinado, del contrato por circunstancias de la producción y del contrato de interinidad."
+autor:Lázaro
