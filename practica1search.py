@@ -1,7 +1,8 @@
 """
 search.py
 Author: Javier Nogueras Iso
-Last update: 2024-09-07
+Editors: Alberto Latorre Cote, Francisco Moreno Domingo
+Last update: 2025-10-06
 
 Program to search a free text query on a previously created inverted index.
 This program is based on the whoosh library. See https://pypi.org/project/Whoosh/ .
