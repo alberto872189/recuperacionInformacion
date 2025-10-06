@@ -28,18 +28,16 @@ class MySearcher:
         fields = ["autor", "director", "departamento", "title", "description", "subject", "fecha"]
         self.parser = MultifieldParser(fields, schema=ix.schema, group=OrGroup)
 
-    def search(self, query_text, output_file=None):
+    def search(self, query_text, i, output_file=None):
         query = self.parser.parse(query_text)
         results = self.searcher.search(query, limit=100)
         if not output_file:
             print('Returned documents:')
-        i = 1
         for result in results:
             if output_file:
                 output.write(f'{i}\t{result.get("path")}\n')
             else:
                 print(f'{i}\t{result.get("path")}')
-            i += 1
 
 
 if __name__ == '__main__':
@@ -70,14 +68,16 @@ if __name__ == '__main__':
     else:
         query = input("Introduce a query: ")
 
+    i = 1
     while query != 'q':
-        searcher.search(query, output_file=output)
+        searcher.search(query, i, output_file=output)
         if input_file:
             query = sys.stdin.readline().strip()
             if query == '':
                 break
         else:
             query = input("Introduce a query ('q' for exit): ")
+        i += 1
 
     if output:
         output.close()
