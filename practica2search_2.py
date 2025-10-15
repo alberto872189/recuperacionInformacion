@@ -32,19 +32,30 @@ class MySearcher:
         fields = ["autor", "director", "departamento", "title", "description", "subject", "fecha"]
         self.parser = MultifieldParser(fields, schema=ix.schema, group=OrGroup)
 
+    def extract_keywords(text, nlp):
+        doc = nlp(text)
+        keywords = set()
+        for ent in doc.ents:
+            keywords.add(ent.text)
+        for token in doc:
+            if not token.is_stop and not token.is_punct and token.is_alpha:
+                keywords.add(token.lemma_)
+        return list(keywords)
+
     def search(self, query_text, i, output_file=None):
         nlp = es_core_news_sm.load()
         text = (query_text)
         doc = nlp(text)
 
         keywords = [token.text for token in doc if token.pos_ in ("NOUN", "PROPN") and not token.is_stop]
+        doc = nlp(text)
 
         keywords_string = ""
         
         for keyword in keywords:
-            if any(subcadena in keyword for subcadena in ["trabaj", "grado"]):
+            if any(subcadena in keyword for subcadena in ["trabaj", "grado", "estudi", "universidad", "curs", "curso", "master", "doctorad", "doctorado", "investig", "investigacion", "proyect", "proyecto"]):
                 continue
-            keywords_string += "description:" + keyword + " "
+            keywords_string += keyword + " "
         print(keywords_string)
         query = self.parser.parse(keywords_string)
         results = self.searcher.search(query, limit=100)
