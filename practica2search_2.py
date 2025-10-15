@@ -13,6 +13,7 @@ import sys
 
 from whoosh.qparser import QueryParser, MultifieldParser
 from whoosh.qparser import OrGroup
+from whoosh.qparser import AndGroup
 from whoosh import scoring
 from index import MyStemmingFilter
 import whoosh.index as index
@@ -32,13 +33,13 @@ class MySearcher:
         fields = ["autor", "director", "departamento", "title", "description", "subject", "fecha"]
         self.parser = MultifieldParser(fields, schema=ix.schema, group=OrGroup)
 
-    def extract_keywords(text, nlp):
+    def extract_keywords(self, text, nlp):
         doc = nlp(text)
         keywords = set()
         for ent in doc.ents:
             keywords.add(ent.text)
         for token in doc:
-            if not token.is_stop and not token.is_punct and token.is_alpha:
+            if not token.is_stop and not token.is_punct and token.is_alpha and token.pos_ in ("NOUN", "PROPN"):
                 keywords.add(token.lemma_)
         return list(keywords)
 
@@ -47,7 +48,7 @@ class MySearcher:
         text = (query_text)
         doc = nlp(text)
 
-        keywords = [token.text for token in doc if token.pos_ in ("NOUN", "PROPN") and not token.is_stop]
+        keywords = self.extract_keywords(text, nlp) # [token.text for token in doc if token.pos_ in ("NOUN", "PROPN") and not token.is_stop]
         doc = nlp(text)
 
         keywords_string = ""
