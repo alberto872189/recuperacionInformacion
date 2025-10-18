@@ -21,6 +21,31 @@ import xml.etree.ElementTree as ET
 import spacy
 import es_core_news_sm
 
+HEURISTIC_KEYWORDS = {
+            "animación": ["subject", "description"],
+            "visión": ["subject", "description"],
+            "computador": ["subject", "description"],
+            "arte": ["subject"],
+            "aragonés": ["description"],
+            "algoritmo": ["subject", "description"],
+            "búsqueda": ["subject", "description"],
+            "medicina": ["subject", "description"],
+            "proteína": ["description"],
+            "síntoma": ["description"],
+            "paciente": ["description"],
+            "veterinaria": ["subject"],
+            "gato": ["description"],
+            "perro": ["description"],
+            "felino": ["description"],
+            "canino": ["description"],
+            "informática": ["departamento"],
+            "departamento": ["departamento"],
+            "fecha": ["fecha"],
+            "año": ["fecha"],
+            "español": ["description"],
+            "inglés": ["description"]
+        }
+
 class MySearcher:
     def __init__(self, index_folder, model_type = 'tfidf'):
         ix = index.open_dir(index_folder)
@@ -37,10 +62,24 @@ class MySearcher:
         doc = nlp(text)
         keywords = set()
         for ent in doc.ents:
-            keywords.add(ent.text)
+            if ent.label_ in ["PER", "ORG"]:
+                for campo in ["autor", "director", "departamento"]:
+                    keywords.add(campo + ":" + ent.text)
+            elif ent.label_ == "LOC":
+                for campo in ["departamento", "description"]:
+                    keywords.add(campo + ":" + ent.text)
+            elif ent.label_ == "DATE":
+                keywords.add(campo + ":" + ent.text)
+            else:
+                keywords.add(ent.label_ + ":" + ent.text)
         for token in doc:
             if not token.is_stop and not token.is_punct and token.is_alpha and token.pos_ in ("NOUN", "PROPN"):
-                keywords.add(token.lemma_)
+                if any(subcadena in token.lemma_.lower() for subcadena in ["trabaj", "grado", "estudi", "universidad", "curs", "curso", "master", "doctorad", "doctorado", "investig", "investigacion", "proyect", "proyecto"]):
+                    continue
+                campos = HEURISTIC_KEYWORDS.get(token.lemma_.lower(), ["autor", "director", "departamento", "title", "description", "subject", "fecha"] if token.ent_type_ == "" else [])
+                for campo in campos:
+                    keywords.add(campo + ":" +token.lemma_)
+            
         return list(keywords)
 
     def search(self, query_text, i, output_file=None):
@@ -54,8 +93,7 @@ class MySearcher:
         keywords_string = ""
         
         for keyword in keywords:
-            if any(subcadena in keyword for subcadena in ["trabaj", "grado", "estudi", "universidad", "curs", "curso", "master", "doctorad", "doctorado", "investig", "investigacion", "proyect", "proyecto"]):
-                continue
+            
             keywords_string += keyword + " "
         print(keywords_string)
         query = self.parser.parse(keywords_string)
