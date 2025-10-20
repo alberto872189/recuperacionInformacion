@@ -2,11 +2,11 @@
 search.py
 Author: Javier Nogueras Iso
 Editors: Alberto Latorre Cote, Francisco Moreno Domingo
-Last update: 2025-10-06
+Last update: 2025-10-20
 
 Program to search a free text query on a previously created inverted index.
 This program is based on the whoosh library. See https://pypi.org/project/Whoosh/ .
-Usage: python search.py -index <index folder>
+Usage: python search.py -index <index folder> -infoNeeds <information needs file> -output <output file>
 """
 
 import sys
@@ -69,7 +69,7 @@ class MySearcher:
                 for campo in ["departamento", "description"]:
                     keywords.add(campo + ":" + ent.text)
             elif ent.label_ == "DATE":
-                keywords.add(campo + ":" + ent.text)
+                keywords.add("fecha" + ":" + ent.text)
             else:
                 keywords.add(ent.label_ + ":" + ent.text)
         for token in doc:
@@ -85,17 +85,15 @@ class MySearcher:
     def search(self, query_text, i, output_file=None):
         nlp = es_core_news_sm.load()
         text = (query_text)
-        doc = nlp(text)
 
-        keywords = self.extract_keywords(text, nlp) # [token.text for token in doc if token.pos_ in ("NOUN", "PROPN") and not token.is_stop]
-        doc = nlp(text)
+        keywords = self.extract_keywords(text, nlp)
 
         keywords_string = ""
         
         for keyword in keywords:
             
             keywords_string += keyword + " "
-        print(keywords_string)
+        #print(keywords_string)
         query = self.parser.parse(keywords_string)
         results = self.searcher.search(query, limit=100)
         if not output_file:
