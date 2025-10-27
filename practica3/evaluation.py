@@ -108,18 +108,33 @@ def print_measures(qrels, results):
             iteration += 1
 
         print('INFORMATION NEED', need_number)
-        print('precision', precision)
-        print('recall', recall)
-        print('F1', f1)
-        print('prec@10', precision10)
-        print('average_precision', avg_precision)
+        print('precision', '{:.3f}'.format(precision))
+        print('recall', '{:.3f}'.format(recall))
+        print('F1', '{:.3f}'.format(f1))
+        print('prec@10', '{:.3f}'.format(precision10))
+        print('average_precision', '{:.3f}'.format(avg_precision))
         print('recall_precision')
         for element in recall_precision:
-            print(element[0], element[1])
+            print('{:.3f} {:.3f}'.format(element[0], element[1]))
         print('interpolated_recall_precision')
         for element in interpolated_recall_precision:
-            print(element[0], element[1]) 
-
+            print('{:.3f} {:.3f}'.format(element[0], element[1]))
+        print()
+        if output_file:
+            with open(output_file, 'a', encoding='utf-8') as out:
+                print('INFORMATION NEED', need_number, file=out)
+                print('precision', '{:.3f}'.format(precision), file=out)
+                print('recall', '{:.3f}'.format(recall), file=out)
+                print('F1', '{:.3f}'.format(f1), file=out)
+                print('prec@10', '{:.3f}'.format(precision10), file=out)
+                print('average_precision', '{:.3f}'.format(avg_precision), file=out)
+                print('recall_precision', file=out)
+                for element in recall_precision:
+                    print('{:.3f} {:.3f}'.format(element[0], element[1]), file=out)
+                print('interpolated_recall_precision', file=out)
+                for element in interpolated_recall_precision:
+                    print('{:.3f} {:.3f}'.format(element[0], element[1]), file=out)
+                print(file=out)
         total_precision += precision
         total_recall += recall
         total_precision10 += precision10
@@ -129,16 +144,53 @@ def print_measures(qrels, results):
 
     
     total_f1 = 2 * total_precision/n_consultas * total_recall/n_consultas / (total_precision/n_consultas + total_recall/n_consultas)
-    
     print('TOTAL')
-    print('precision', total_precision/n_consultas)
-    print('recall', total_recall/n_consultas)
-    print('F1', total_f1)
-    print('prec@10', total_precision10/n_consultas)
-    print('MAP', total_avg_precision/n_consultas)
+    print('precision', '{:.3f}'.format(total_precision / n_consultas))
+    print('recall', '{:.3f}'.format(total_recall / n_consultas))
+    print('F1', '{:.3f}'.format(total_f1))
+    print('prec@10', '{:.3f}'.format(total_precision10 / n_consultas))
+    print('MAP', '{:.3f}'.format(total_avg_precision / n_consultas))
     print('interpolated_recall_precision')
-    for element in total_precision_for_interpolated:
-        print(recalls[0], element/n_consultas) 
+    for idx, element in enumerate(total_precision_for_interpolated):
+        print('{:.3f} {:.3f}'.format(recalls[idx], element / n_consultas))
+    
+    if output_file:
+        with open(output_file, 'a', encoding='utf-8') as out:
+            print('TOTAL', file=out)
+            print('precision', '{:.3f}'.format(total_precision / n_consultas), file=out)
+            print('recall', '{:.3f}'.format(total_recall / n_consultas), file=out)
+            print('F1', '{:.3f}'.format(total_f1), file=out)
+            print('prec@10', '{:.3f}'.format(total_precision10 / n_consultas), file=out)
+            print('MAP', '{:.3f}'.format(total_avg_precision / n_consultas), file=out)
+            print('interpolated_recall_precision', file=out)
+            for idx, element in enumerate(total_precision_for_interpolated):
+                print('{:.3f} {:.3f}'.format(recalls[idx], element / n_consultas), file=out)
+            print(file=out)
+
+        # Gráfica de Precision-Recall
+        try:
+            import matplotlib.pyplot as plt
+            if n_consultas > 0:
+                x = recalls
+                y = [element / n_consultas for element in total_precision_for_interpolated]
+                plt.figure()
+                plt.plot(x, y, marker='o', linestyle='-')
+                plt.xlabel('Recall')
+                plt.ylabel('Precision')
+                plt.title('Interpolated Precision-Recall (TOTAL)')
+                plt.grid(True)
+                png_name = 'precision_recall_total.png'
+                plt.savefig(png_name, bbox_inches='tight')
+                """try:
+                    plt.show()
+                except Exception:
+                    # entorno sin pantalla, ya hemos guardado la imagen
+                    pass"""
+            else:
+                print('No hay consultas para graficar.')
+        except Exception:
+            print('matplotlib no disponible, no se puede mostrar la gráfica.')
+
 
 i = 1
 while i < len(sys.argv):
