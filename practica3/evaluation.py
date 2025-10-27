@@ -32,6 +32,13 @@ def read_results_file():
     
     return results
 
+
+def safe_div(a, b):
+    try:
+        return a / b if b != 0 else 0.0
+    except Exception:
+        return 0.0
+
 def get_positives_negatives(qrels, results, k = -1):
     tp = 0
     tn = 0
@@ -39,7 +46,10 @@ def get_positives_negatives(qrels, results, k = -1):
     fn = 0
     iterations = 1
     for result in results:
-        if (qrels[result] == '1'):
+        # Algunos documentos devueltos por el sistema pueden no estar en los qrels
+        # (no juzgados). En ese caso los tratamos como no relevantes ('0').
+        relevance = qrels.get(result, '0') if isinstance(qrels, dict) else '0'
+        if (relevance == '1'):
             tp += 1
         else:
             fp += 1
@@ -51,6 +61,9 @@ def get_positives_negatives(qrels, results, k = -1):
         
     iterations = 1
     results_k = results[:k] if k != -1 else results
+    # Ahora contamos los documentos relevantes/no relevantes que no aparecen
+    # en la lista de resultados hasta k (si se pidió). qrels es un diccionario
+    # mapping docID -> relevance ('1' o '0').
     for key in list(qrels.keys()):
         if key not in results_k:
             if qrels[key] == '1':
@@ -75,12 +88,12 @@ def print_measures(qrels, results):
         this_qrels = qrels[key]
         this_results = [value[1] for value in results if value[0] == key]
         [tp, tn, fp, fn] = get_positives_negatives(this_qrels, this_results)
-        precision = tp / (tp + fp)
-        recall = tp / (tp + fn)
+        precision = safe_div(tp, (tp + fp))
+        recall = safe_div(tp, (tp + fn))
         [tp10, tn10, fp10, fn10] = get_positives_negatives(this_qrels, this_results, 10)
-        precision10 = tp10 / (tp10 + fp10)
+        precision10 = safe_div(tp10, (tp10 + fp10))
 
-        f1 = 2 * precision * recall / (precision + recall)
+        f1 = safe_div(2 * precision * recall, (precision + recall))
 
         avg_precision = 0
         iteration = 1
@@ -89,8 +102,8 @@ def print_measures(qrels, results):
         for key in list(this_qrels.keys()):
             if this_qrels[key] == '1' and key in this_results:
                 [tpk, tnk, fpk, fnk] = get_positives_negatives(this_qrels, this_results, iteration)
-                precisionk = tpk / (tpk + fpk)
-                recallk = tpk / (tpk + fnk)
+                precisionk = safe_div(tpk, (tpk + fpk))
+                recallk = safe_div(tpk, (tpk + fnk))
                 recall_precision.append([recallk, precisionk])
                 avg_precision += precisionk
                 n_relevants += 1
@@ -143,7 +156,9 @@ def print_measures(qrels, results):
 
 
     
-    total_f1 = 2 * total_precision/n_consultas * total_recall/n_consultas / (total_precision/n_consultas + total_recall/n_consultas)
+    avg_prec = total_precision / n_consultas if n_consultas > 0 else 0.0
+    avg_rec = total_recall / n_consultas if n_consultas > 0 else 0.0
+    total_f1 = safe_div(2 * avg_prec * avg_rec, (avg_prec + avg_rec))
     print('TOTAL')
     print('precision', '{:.3f}'.format(total_precision / n_consultas))
     print('recall', '{:.3f}'.format(total_recall / n_consultas))
