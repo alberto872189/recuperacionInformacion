@@ -58,8 +58,7 @@ def get_positives_negatives(qrels, results, k = -1):
             if iterations >= k:
                 break
         iterations += 1
-        
-    iterations = 1
+
     results_k = results[:k] if k != -1 else results
     # Ahora contamos los documentos relevantes/no relevantes que no aparecen
     # en la lista de resultados hasta k (si se pidió). qrels es un diccionario
@@ -86,7 +85,8 @@ def print_measures(qrels, results):
     for key in list(qrels.keys()):
         need_number = key
         this_qrels = qrels[key]
-        this_results = [value[1] for value in results if value[0] == key]
+        # Only consider the first 50 returned documents for each query
+        this_results = [value[1] for value in results if value[0] == key][:50]
         [tp, tn, fp, fn] = get_positives_negatives(this_qrels, this_results)
         precision = safe_div(tp, (tp + fp))
         recall = safe_div(tp, (tp + fn))
@@ -96,20 +96,20 @@ def print_measures(qrels, results):
         f1 = safe_div(2 * precision * recall, (precision + recall))
 
         avg_precision = 0
-        iteration = 1
-        n_relevants = 0
         recall_precision = []
-        for key in list(this_qrels.keys()):
-            if this_qrels[key] == '1' and key in this_results:
-                [tpk, tnk, fpk, fnk] = get_positives_negatives(this_qrels, this_results, iteration)
+        n_relevants_found = 0
+        for idx, docid in enumerate(this_results, start=1):
+            if this_qrels.get(docid, '0') == '1':
+                [tpk, tnk, fpk, fnk] = get_positives_negatives(this_qrels, this_results, idx)
                 precisionk = safe_div(tpk, (tpk + fpk))
                 recallk = safe_div(tpk, (tpk + fnk))
                 recall_precision.append([recallk, precisionk])
                 avg_precision += precisionk
-                n_relevants += 1
-            iteration += 1
-        if n_relevants > 0:
-            avg_precision /= n_relevants
+                n_relevants_found += 1
+        if n_relevants_found > 0:
+            avg_precision = avg_precision / n_relevants_found
+        else:
+            avg_precision = 0
 
         interpolated_recall_precision = []
         iteration = 0
@@ -220,7 +220,15 @@ while i < len(sys.argv):
         i += 1
     i += 1
 
+#truncar el fichero de salida
+if output_file:
+    try:
+        with open(output_file, 'w', encoding='utf-8'):
+            pass
+    except Exception:
+        pass
+
 qrels = read_qrels_file()
 results = read_results_file()
- 
+
 print_measures(qrels, results)
