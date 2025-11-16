@@ -8,14 +8,14 @@ import xml.etree.ElementTree as ET
 import textClassifier_Transformer_main as model
 import textClassifier__TrainerTester as trainertester
 
-categories = ['Ingeniería', 'Ciencias de la Salud', 'Artes y Humanidades', 'Ciencias', 'Ciencias sociales y jurídicas']
-
+categories = ['Ingeniería', 'Ciencias de la Salud', 'Artes y Humanidades', 'Ciencias', 'Ciencias sociales y jurídicas', 'Otros']
 relations = {
     'Ingeniería': ['Arquitectura', 'Defensa y Seguridad', 'Agroalimentaria y del Medio Rural', 'Biomédica', 'Civil', 'Industrial', 'Telecomunicación', 'Eléctrica', 'Electrónica', 'Informática', 'Mecánica', 'Mecatrónica', 'Ingeniería Química'],
-    'Ciencias de la Salud': ['Enfermería', 'Fisioterapia', 'Medicina', 'Nutrición', 'Odontología', 'Psicología', 'Terapia Ocupacional', 'Veterinaria'],
+    'Ciencias de la Salud': ['Salud', 'Enfermería', 'Fisioterapia', 'Medicina', 'Nutrición', 'Odontología', 'Psicología', 'Terapia Ocupacional', 'Veterinaria'],
     'Artes y Humanidades': ['Bellas Artes', 'Estudios Clásicos', 'Estudios Ingleses', 'Filología Hispánica', 'Filosofía', 'Historia', 'Lenguas Modernas'],
     'Ciencias': ['Biotecnología', 'Ciencia', 'Física', 'Geología', 'Matemáticas', 'Óptica', 'Química'],
-    'Ciencias sociales y jurídicas': ['Administración', 'Deporte', 'Derecho', 'Economía', 'Empresa', 'Finanzas', 'Geografía', 'Gestión', 'Información', 'Educación', 'Marketing', 'Periodismo', 'Relaciones Laborales', 'Trabajo Social', 'Turismo']
+    'Ciencias sociales y jurídicas': ['Administración', 'Deporte', 'Derecho', 'Economía', 'Empresa', 'Finanzas', 'Geografía', 'Gestión', 'Información', 'Educación', 'Marketing', 'Periodismo', 'Relaciones Laborales', 'Trabajo Social', 'Turismo'],
+    'Otros': ['Auditoría', 'Eficiencia Energética', 'ADE', 'DERECHO', 'Nutricionales']
 }
 
 def generate_datasets(input_dir):
@@ -65,7 +65,7 @@ def generate_datasets(input_dir):
         if (doc_type != 'TAZ-TFG'):
             continue
 
-        if not solved: print(file_path, '\n')
+        if not solved: print(file_path, ': ', doc_type, '\n')
         valid_documents.append((file_path, title, description, subject))
     training_set = random.sample(valid_documents, k=int(0.8*len(valid_documents)))
     test_set = list(set(valid_documents).difference(training_set))
@@ -114,13 +114,18 @@ y_train = training_set['Class Index']
 X_test = test_set['Text']
 y_test = test_set['Class Index']
 
-vectorizer = TextVectorization(max_tokens=None,output_mode='int', output_sequence_length=200)
+MAX_LEN = 200  # Debe coincidir con vectorizer.output_sequence_length
+vectorizer = TextVectorization(max_tokens=None, output_mode='int', output_sequence_length=MAX_LEN)
 vectorizer.adapt(X_train)
+
 X_train = vectorizer(X_train)
 X_test = vectorizer(X_test)
-y_train = to_categorical(training_set['Class Index'].values) # type: ignore
-y_test = to_categorical(test_set['Class Index'].values) # type: ignore
 
-my_model = model.createModel(200, 10)
+y_train = to_categorical(training_set['Class Index'].values)
+y_test = to_categorical(test_set['Class Index'].values)
 
+# voc_size = tamaño del vocabulario generado por vectorizer
+voc_size = len(vectorizer.get_vocabulary())
+
+my_model = model.createModel(voc_size, MAX_LEN)
 trainertester.trainerTester(my_model, [X_train, y_train, X_test, y_test], 10, 'misresultados')

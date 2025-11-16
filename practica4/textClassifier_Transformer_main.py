@@ -28,7 +28,7 @@ def createModel(tamVoc,tamFrase):
     # Se podría usar la capa Flatten para usar todos los parámetros, pero incrementa sustancialmente el tamaño del modelo y con tas pocos datos da malos resultados.
     model.add(GlobalAveragePooling1D())  # Otra alternativa es GlobalMaxPooling1D que captura las características dominantes en vez de mediar la información de todas las palabras.
     model.add(Dense(12, activation='relu'))
-    model.add(Dense(5, activation='softmax'))
+    model.add(Dense(6, activation='softmax'))
     model.compile(loss='CategoricalCrossentropy', optimizer=Adam(1e-4), metrics=['accuracy']) # type: ignore
     return model
 
