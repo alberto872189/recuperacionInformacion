@@ -5,6 +5,7 @@
 # Importaciones requeridas.
 import numpy as np, os
 from commonFunctions import Chronometer, saveResults
+from sklearn.metrics import confusion_matrix
 
 #-------------------------------------------------------------------------------
 # Método para entrenar un modelo, con los datos pasados como parámetro, y cierto número de epoch.
@@ -12,7 +13,7 @@ from commonFunctions import Chronometer, saveResults
 #-------------------------------------------------------------------------------
 def trainerTester(model, data, epochs, dir):
     # Se crea una carpeta donde guardar los resultados.
-    dir='results/'+dir
+    dir=dir
     os.makedirs(dir, exist_ok=True)
     
     # Separamos los datos de entrenamiento y test del conjunto pasado como parámetro. 
@@ -34,14 +35,27 @@ def trainerTester(model, data, epochs, dir):
         
         #Guardamos la precisión del modelo en el test set.
         scores = model.evaluate(X_test, y_test, verbose=0)
-        printAll('Model precision: {:.2%}'.format(scores[1])) 
+        printAll('Model precision: {:.2%}'.format(scores[1]))
+        # Obtener etiquetas verdaderas y predichas (manejando one-hot y etiquetas enteras)
+        y_true = np.argmax(y_test, axis=1) if getattr(y_test, "ndim", 1) > 1 else y_test
+        y_pred = np.argmax(model.predict(X_test, verbose=0), axis=1)
+
+        # Calcular matriz de confusión
+        cm = confusion_matrix(y_true, y_pred)
+
+        # Guardar matriz en confusion.txt
+        # Opción: más espacio con ancho de campo fijo
+        np.savetxt(os.path.join(dir, 'confusion.txt'), cm, fmt='%6d', delimiter=' ')
+
+        # Opción alternativa: más separación con tabulaciones
+        # np.savetxt(os.path.join(dir, 'confusion.txt'), cm, fmt='%d', delimiter='\t\t')
         
         # Guardamos un ejemplo de una clasificación.
-        printAll('Classification result of first element in test set')
+        """printAll('Classification result of first element in test set')
         printAll('Real category: ', np.argmax(y_test[0]) + 1, ' Predicted Category: ',
                 np.argmax(model.predict(np.expand_dims(X_test[0], axis=0), verbose=0)[0]) + 1)
         print('')
-        
+        """
         
         
         

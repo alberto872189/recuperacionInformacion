@@ -128,4 +128,4 @@ y_test = to_categorical(test_set['Class Index'].values)
 voc_size = len(vectorizer.get_vocabulary())
 
 my_model = model.createModel(voc_size, MAX_LEN)
-trainertester.trainerTester(my_model, [X_train, y_train, X_test, y_test], 10, 'misresultados')
+trainertester.trainerTester(my_model, [X_train, y_train, X_test, y_test], 10, output_dir)

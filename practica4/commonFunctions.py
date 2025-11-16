@@ -88,8 +88,8 @@ def saveResults(model, history, trainingTime, dir):
     summary = '\n'.join(summary_str)
     
     # Se guarda la evolución de la precisión y error durante el entrenamiento.
-    saveTrainingGraph(history.history['accuracy'], None, "Accuracy", None, 'Epoch', 'Precision', dir+'/trainingAccuracy.jpg')
-    saveTrainingGraph(history.history['loss'], history.history['val_loss'], 'Training Loss', 'Validation Loss','Epoch', 'Error', dir+'/trainingLoss.jpg')
+    saveTrainingGraph(history.history['accuracy'], None, "Accuracy", None, 'Epoch', 'Precision', dir+'/precision.jpg')
+    saveTrainingGraph(history.history['loss'], history.history['val_loss'], 'Training Loss', 'Validation Loss','Epoch', 'Error', dir+'/errror.jpg')
     
     # Se guarda el tiempo de entrenamiento, estructura del modelo y su precisión.
     with open(dir+'/testResults.txt', 'w', encoding='utf-8', errors='ignore') as f:
