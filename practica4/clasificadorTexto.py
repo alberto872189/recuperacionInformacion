@@ -8,14 +8,13 @@ import xml.etree.ElementTree as ET
 import textClassifier_Transformer_main as model
 import textClassifier__TrainerTester as trainertester
 
-categories = ['Ingeniería', 'Ciencias de la Salud', 'Artes y Humanidades', 'Ciencias', 'Ciencias sociales y jurídicas', 'Otros']
+categories = ['Ingeniería', 'Ciencias de la Salud', 'Artes y Humanidades', 'Ciencias', 'Ciencias sociales y jurídicas']
 relations = {
-    'Ingeniería': ['Arquitectura', 'Defensa y Seguridad', 'Agroalimentaria y del Medio Rural', 'Biomédica', 'Civil', 'Industrial', 'Telecomunicación', 'Eléctrica', 'Electrónica', 'Informática', 'Mecánica', 'Mecatrónica', 'Ingeniería Química'],
-    'Ciencias de la Salud': ['Salud', 'Enfermería', 'Fisioterapia', 'Medicina', 'Nutrición', 'Odontología', 'Psicología', 'Terapia Ocupacional', 'Veterinaria'],
+    'Ingeniería': ['Arquitectura', 'Defensa y Seguridad', 'Agroalimentaria y del Medio Rural', 'Biomédica', 'Civil', 'Industrial', 'Telecomunicación', 'Eléctrica', 'Electrónica', 'Informática', 'Mecánica', 'Mecatrónica', 'Ingeniería Química', 'Eficiencia Energética'],
+    'Ciencias de la Salud': ['Salud', 'Enfermería', 'Fisioterapia', 'Medicina', 'Nutrición', 'Odontología', 'Psicología', 'Terapia Ocupacional', 'Veterinaria', 'Nutricionales'],
     'Artes y Humanidades': ['Bellas Artes', 'Estudios Clásicos', 'Estudios Ingleses', 'Filología Hispánica', 'Filosofía', 'Historia', 'Lenguas Modernas'],
     'Ciencias': ['Biotecnología', 'Ciencia', 'Física', 'Geología', 'Matemáticas', 'Óptica', 'Química'],
-    'Ciencias sociales y jurídicas': ['Administración', 'Deporte', 'Derecho', 'Economía', 'Empresa', 'Finanzas', 'Geografía', 'Gestión', 'Información', 'Educación', 'Marketing', 'Periodismo', 'Relaciones Laborales', 'Trabajo Social', 'Turismo'],
-    'Otros': ['Auditoría', 'Eficiencia Energética', 'ADE', 'DERECHO', 'Nutricionales']
+    'Ciencias sociales y jurídicas': ['Administración', 'Deporte', 'Derecho', 'Economía', 'Empresa', 'Finanzas', 'Geografía', 'Gestión', 'Información', 'Educación', 'Marketing', 'Periodismo', 'Relaciones Laborales', 'Trabajo Social', 'Turismo', 'ADE', 'DERECHO', 'Auditoría']
 }
 
 def generate_datasets(input_dir):
