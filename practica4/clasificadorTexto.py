@@ -1,5 +1,18 @@
 import os
 import sys
+
+# --- Reproducibility settings: must be set before importing TensorFlow/keras ---
+SEED = 0
+# Make Python hashing deterministic
+os.environ['PYTHONHASHSEED'] = str(SEED)
+# Disable some non-deterministic optimizations and force deterministic ops where possible
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+# Optionally disable GPU to increase cross-machine reproducibility (uncomment to force CPU-only)
+os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
 import random
 import pandas as pd, numpy as np, commonFunctions
 from commonFunctions import to_categorical, cleanTexts, TextVectorization
@@ -8,17 +21,12 @@ import xml.etree.ElementTree as ET
 import textClassifier_Transformer_main as model
 import textClassifier__TrainerTester as trainertester
 
-SEED = 0
-
+# Set seeds for Python and NumPy before importing TensorFlow
 random.seed(SEED)
 np.random.seed(SEED)
 
 import tensorflow as tf
 tf.random.set_seed(SEED)
-
-os.environ["PYTHONHASHSEED"] = str(SEED)
-os.environ["TF_DETERMINISTIC_OPS"] = "1"
-os.environ["TF_CUDNN_DETERMINISTIC"] = "1"
 
 categories = ['Ingeniería', 'Ciencias de la Salud', 'Artes y Humanidades', 'Ciencias', 'Ciencias sociales y jurídicas']
 relations = {
@@ -48,7 +56,6 @@ def generate_datasets(input_dir):
 
         # Mostrar la URI asociada al prefijo 'dc'
         dc_uri = namespaces.get('dc')
-
         doc_type = ''
         title = ''
         description = ''
@@ -71,7 +78,7 @@ def generate_datasets(input_dir):
                             break
                     i += 1
                     if solved: break
-            
+
 
         if (doc_type != 'TAZ-TFG'):
             continue
