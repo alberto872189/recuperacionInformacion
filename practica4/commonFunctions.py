@@ -8,7 +8,7 @@ import os, re, unicodedata
 # Desactiva ciertas operaciones en la gráfica que aceleran la ejecución pero impiden la reproducibilidad.
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0" 
 # Ocultamos warnings de configuración que pueden dar las librerías de keras.
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import  numpy as np, random, tensorflow, time, matplotlib.pyplot as plt, tensorflow.data as tf_data # type: ignore
 

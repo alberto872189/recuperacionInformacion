@@ -9,7 +9,7 @@ os.environ['PYTHONHASHSEED'] = str(SEED)
 os.environ['TF_DETERMINISTIC_OPS'] = '1'
 os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Optionally disable GPU to increase cross-machine reproducibility (uncomment to force CPU-only)
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
 
@@ -27,6 +27,12 @@ np.random.seed(SEED)
 
 import tensorflow as tf
 tf.random.set_seed(SEED)
+import logging
+# Reduce TensorFlow Python logger verbosity as well
+try:
+    tf.get_logger().setLevel(logging.ERROR)
+except Exception:
+    pass
 
 categories = ['Ingeniería', 'Ciencias de la Salud', 'Artes y Humanidades', 'Ciencias', 'Ciencias sociales y jurídicas']
 relations = {
