@@ -8,6 +8,18 @@ import xml.etree.ElementTree as ET
 import textClassifier_Transformer_main as model
 import textClassifier__TrainerTester as trainertester
 
+SEED = 0
+
+random.seed(SEED)
+np.random.seed(SEED)
+
+import tensorflow as tf
+tf.random.set_seed(SEED)
+
+os.environ["PYTHONHASHSEED"] = str(SEED)
+os.environ["TF_DETERMINISTIC_OPS"] = "1"
+os.environ["TF_CUDNN_DETERMINISTIC"] = "1"
+
 categories = ['Ingeniería', 'Ciencias de la Salud', 'Artes y Humanidades', 'Ciencias', 'Ciencias sociales y jurídicas']
 relations = {
     'Ingeniería': ['Arquitectura', 'Defensa y Seguridad', 'Agroalimentaria y del Medio Rural', 'Biomédica', 'Civil', 'Industrial', 'Telecomunicación', 'Eléctrica', 'Electrónica', 'Informática', 'Mecánica', 'Mecatrónica', 'Ingeniería Química', 'Eficiencia Energética'],
