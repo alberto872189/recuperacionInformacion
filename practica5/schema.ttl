@@ -1,0 +1,68 @@
+@prefix mi: <http://miuri/xd#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <https://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <https://www.w3.org/2001/XMLSchema#> .
+
+# Clases
+mi:AcademicWork a rdfs:Class .
+
+mi:Persona a rdfs:Class .
+
+mi:Subject a rdfs:Class .
+
+mi:Publisher a rdfs:Class .
+
+mi:TFG rdfs:subClassOf mi:AcademicWork .
+
+mi:TFM rdfs:subClassOf mi:AcademicWork .
+
+mi:Tesis rdfs:subClassOf mi:AcademicWork .
+
+# Propiedades
+mi:hasAuthor a rdf:Property ;
+    rdfs:domain mi:AcademicWork ;
+    rdfs:range mi:Persona .
+
+mi:title a rdf:Property ;
+    rdfs:domain mi:AcademicWork ;
+    rdfs:range rdfs:Literal .
+
+mi:year a rdf:Property ;
+    rdfs:domain mi:AcademicWork ;
+    rdfs:range xsd:gYear .
+
+mi:subject a rdf:Property ;
+    rdfs:domain mi:AcademicWork ;
+    rdfs:range mi:Subject .
+
+mi:license a rdf:Property ;
+    rdfs:domain mi:AcademicWork ;
+    rdfs:range xsd:anyURI .
+
+mi:contributor a rdf:Property ; # director
+    rdfs:domain mi:AcademicWork ;
+    rdfs:range mi:Persona .
+
+mi:description a rdf:Property ;
+    rdfs:domain mi:AcademicWork ;
+    rdfs:range rdfs:Literal .
+
+mi:language a rdf:Property ;
+    rdfs:domain mi:AcademicWork ;
+    rdfs:range xsd:language .
+
+mi:publisher a rdf:Property ;
+    rdfs:domain mi:AcademicWork ;
+    rdfs:range mi:Publisher .
+
+mi:relation a rdf:Property ; # enlace al pdf del trabajo
+    rdfs:domain mi:AcademicWork ;
+    rdfs:range xsd:anyURI .
+
+mi:nombrePersona a rdf:Property ;
+    rdfs:domain mi:Persona ;
+    rdfs:range rdfs:Literal .
+
+mi:nombrePublisher a rdf:Property ;
+    rdfs:domain mi:Publisher ;
+    rdfs:range rdfs:Literal .
