@@ -59,10 +59,10 @@ mi:relation a rdf:Property ; # enlace al pdf del trabajo
     rdfs:domain mi:AcademicWork ;
     rdfs:range xsd:anyURI .
 
-mi:nombrePersona a rdf:Property ;
+mi:namePersona a rdf:Property ;
     rdfs:domain mi:Persona ;
     rdfs:range rdfs:Literal .
 
-mi:nombrePublisher a rdf:Property ;
+mi:namePublisher a rdf:Property ;
     rdfs:domain mi:Publisher ;
     rdfs:range rdfs:Literal .

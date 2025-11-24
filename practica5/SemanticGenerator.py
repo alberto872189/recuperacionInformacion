@@ -8,15 +8,25 @@ from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import RDFS, RDF, XSD, Namespace
 
 from re import sub
+import unicodedata, re
 
 # Define a function to convert a string to camel case
 def camel_case(s):
-    # Use regular expression substitution to replace underscores and hyphens with spaces,
-    # then title case the string (capitalize the first letter of each word), and remove spaces
+    if not s:
+        return s
+    # quitar comillas dobles
+    s = s.replace('"', '')
+    # reemplazar guiones/underscores por espacios, capitalizar y eliminar espacios
     s = sub(r"(_|-)+", " ", s).title().replace(" ", "")
-    
-    # Join the string, ensuring the first letter is lowercase
-    return ''.join([s[0].lower(), s[1:]])
+    if not s:
+        return s
+    s = s[0].lower() + s[1:]
+    # normalizar y quitar diacríticos (á, ñ, etc.)
+    s = unicodedata.normalize('NFKD', s)
+    s = ''.join(ch for ch in s if not unicodedata.combining(ch))
+    # quitar cualquier caracter que no sea letra o número
+    s = re.sub(r'[^A-Za-z0-9]', '', s)
+    return s
 
 # Configuración del servicio FUSEKI
 FUSEKI_HOST = 'http://localhost:3030'
@@ -25,15 +35,15 @@ ADMIN_USER = 'admin'
 ADMIN_PASS = 'admin'
 ENDPOINT = f'{FUSEKI_HOST}/{DATASET_NAME}/sparql'
 BASE_URI = 'http://miuri/xd/'
-BASE_URI_ACADEMICWORK = 'http://miuri/xd/AcademicWork'
-BASE_URI_TFG = 'http://miuri/xd/TFG'
-BASE_URI_TFM = 'http://miuri/xd/TFM'
-BASE_URI_TESIS = 'http://miuri/xd/Tesis'
-BASE_URI_PERSONA = 'http://miuri/xd/Persona'
-BASE_URI_SUBJECT = 'http://miuri/xd/Subject'
-BASE_URI_PUBLISHER = 'http://miuri/xd/Publisher'
+BASE_URI_ACADEMICWORK = 'http://miuri/xd/AcademicWork/'
+BASE_URI_TFG = 'http://miuri/xd/TFG/'
+BASE_URI_TFM = 'http://miuri/xd/TFM/'
+BASE_URI_TESIS = 'http://miuri/xd/Tesis/'
+BASE_URI_PERSONA = 'http://miuri/xd/Persona/'
+BASE_URI_SUBJECT = 'http://miuri/xd/Subject/'
+BASE_URI_PUBLISHER = 'http://miuri/xd/Publisher/'
 
-rdf_path = './schema.ttl'
+rdf_path = './zaguan.ttl'
 docs_path = '../recordsdc'
 
 i = 1
@@ -65,67 +75,87 @@ for doc in os.scandir(docs_path):
     # Mostrar la URI asociada al prefijo 'dc'
     dc_uri = namespaces.get('dc')
     doc_type = ''
-    title = ''
-    description = ''
-    subject = -1
-    contributor = ''
-    creator = ''
-    date = ''
+    title = []
+    description = []
+    subject = []
+    contributor = []
+    creator = []
+    date = []
     identifier = ''
-    language = ''
-    publisher = ''
-    relation = ''
-    rights = ''
+    language = []
+    publisher = []
+    relation = []
+    rights = []
+
+    
 
     solved = False
     for child in root:
         if child.tag == f'{{{dc_uri}}}type':
             if child.text: doc_type += child.text
         if child.tag == f'{{{dc_uri}}}description':
-            if child.text: description += child.text
+            if child.text: description.append(child.text)
+            
         if child.tag == f'{{{dc_uri}}}title':
-            if child.text: title += child.text
+            if child.text: title.append(child.text)
         if child.tag == f'{{{dc_uri}}}subject':
-            if child.text: subject += child.texts
+            if child.text: 
+                subject.append(child.text)
         if child.tag == f'{{{dc_uri}}}contributor':
-            if child.text: contributor += child.texts
+            if child.text: contributor.append(child.text)
         if child.tag == f'{{{dc_uri}}}creator':
-            if child.text: creator += child.texts
+            if child.text: creator.append(child.text)
         if child.tag == f'{{{dc_uri}}}date':
-            if child.text: date += child.texts
+            if child.text: date.append(child.text)
         if child.tag == f'{{{dc_uri}}}identifier':
-            if child.text: identifier += child.texts
+            if child.text: identifier = child.text
         if child.tag == f'{{{dc_uri}}}language':
-            if child.text: language += child.texts
+            if child.text: language.append(child.text)
         if child.tag == f'{{{dc_uri}}}publisher':
-            if child.text: publisher += child.texts
+            if child.text: publisher.append(child.text)
         if child.tag == f'{{{dc_uri}}}relation':
-            if child.text: relation += child.texts
+            if child.text: relation.append(child.text)
         if child.tag == f'{{{dc_uri}}}rights':
-            if child.text: rights += child.texts
+            if child.text: rights.append(child.text)
+
 
     base_doc_uri = BASE_URI_TFG if doc_type == 'TAZ-TFG' else BASE_URI_TFM if doc_type == 'TAZ-TFM' else BASE_URI_TESIS if doc_type == 'TESIS' else BASE_URI_ACADEMICWORK
-    doc_uri = URIRef(base_doc_uri + identifier) #TODO POSIBLEMENTE ESTO ESTA MAL
+    doc_uri = URIRef(identifier)
+    model.add((doc_uri, RDF.type, URIRef(base_doc_uri)))
 
-    creator_uri = URIRef(BASE_URI_PERSONA + camel_case(creator))
-    model.add((creator_uri, RDF.type, BASE_URI_PERSONA))
-    model.add((creator_uri, URIRef(BASE_URI + "namePersona"), Literal(creator)))
-    
-    contributor_uri = URIRef(BASE_URI_PERSONA + camel_case(contributor))
-    model.add((contributor_uri, RDF.type, BASE_URI_PERSONA))
-    model.add((contributor_uri, URIRef(BASE_URI + "namePersona"), Literal(contributor)))
+    for c in creator:
+        creator_uri = URIRef(BASE_URI_PERSONA + camel_case(c))
+        model.add((creator_uri, RDF.type, URIRef(BASE_URI_PERSONA)))
+        model.add((creator_uri, URIRef(BASE_URI + "namePersona"), Literal(c)))
+        model.add((doc_uri, URIRef(BASE_URI + "creator"), creator_uri))
+    for c in contributor:
+        contributor_uri = URIRef(BASE_URI_PERSONA + camel_case(c))
+        model.add((contributor_uri, RDF.type, URIRef(BASE_URI_PERSONA)))
+        model.add((contributor_uri, URIRef(BASE_URI + "namePersona"), Literal(c)))
+        model.add((doc_uri, URIRef(BASE_URI + "contributor"), contributor_uri))
+    for p in publisher:
+        publisher_uri = URIRef(BASE_URI_PUBLISHER + camel_case(p))
+        model.add((publisher_uri, RDF.type, URIRef(BASE_URI_PUBLISHER)))
+        model.add((publisher_uri, URIRef(BASE_URI + "namePublisher"), Literal(p)))
+        model.add((doc_uri, URIRef(BASE_URI + "publisher"), publisher_uri))
+    for subj in subject:
+        subject_uri = URIRef(BASE_URI_SUBJECT + camel_case(subj))
+        model.add((doc_uri, URIRef(BASE_URI + "subject"), subject_uri))
 
-    publisher_uri = URIRef(BASE_URI_PUBLISHER + camel_case(publisher))
-    model.add((publisher_uri, RDF.type, BASE_URI_PUBLISHER))
-    model.add((publisher_uri, URIRef(BASE_URI + "namePublisher"), Literal(publisher)))
     
-    model.add((doc_uri, URIRef(BASE_URI + "title"), Literal(title)))
-    model.add((doc_uri, URIRef(BASE_URI + "date"), XSD.gYear(date)))
-    model.add((doc_uri, URIRef(BASE_URI + "description"), Literal(description)))
-    model.add((doc_uri, URIRef(BASE_URI + "langauge"), XSD.language(language)))
-    model.add((doc_uri, URIRef(BASE_URI + "relation"), XSD.anyURI(relation)))
-    model.add((doc_uri, URIRef(BASE_URI + "license"), XSD.anyURI(rights)))
-    model.add((doc_uri, URIRef(BASE_URI + "creator"), creator_uri))
-    model.add((doc_uri, URIRef(BASE_URI + "contributor"), contributor_uri))
-    model.add((doc_uri, URIRef(BASE_URI + "publisher"), publisher_uri))
-    model.add((doc_uri, URIRef(BASE_URI + "subject"), Literal(subject))) #TODO cambiar
+    
+    for t in title:
+        model.add((doc_uri, URIRef(BASE_URI + "title"), Literal(t)))
+    for d in date:
+        model.add((doc_uri, URIRef(BASE_URI + "date"), Literal(d, datatype=XSD.gYear)))
+    for d in description:
+        model.add((doc_uri, URIRef(BASE_URI + "description"), Literal(d)))
+    for l in language:
+        model.add((doc_uri, URIRef(BASE_URI + "language"), Literal(l, datatype=XSD.language)))
+    for r in relation:
+        model.add((doc_uri, URIRef(BASE_URI + "relation"), Literal(r, datatype=XSD.anyURI)))
+    for rt in rights:
+        model.add((doc_uri, URIRef(BASE_URI + "license"), Literal(rt, datatype=XSD.anyURI)))
+    
+
+model.serialize(destination=rdf_path, format='turtle')
