@@ -7,14 +7,14 @@ from rdflib import Graph
 
 # Configuración del servicio FUSEKI
 FUSEKI_HOST = 'http://localhost:3030'
-DATASET_NAME = 'datasetExample3'
+DATASET_NAME = 'datasetZaguan'
 ADMIN_USER = 'admin'
 ADMIN_PASS = 'admin'
 ENDPOINT = f'{FUSEKI_HOST}/{DATASET_NAME}/sparql'
 
 
 rdf_path = './schema.ttl'
-conf_path = './conf.ttl'
+conf_path = './zaguan_config.ttl'
 
 i = 1
 while i < len(sys.argv):
@@ -62,5 +62,5 @@ def fusekiConfiguration(dataset_name, config_file, rdf_file):
         print(f'Error creando dataset: {response.status_code} - {response.text}')
 
 
-fusekiConfiguration('dataset epico', conf_path, rdf_path)
+fusekiConfiguration(DATASET_NAME, conf_path, rdf_path)
 

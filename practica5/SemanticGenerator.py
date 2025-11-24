@@ -159,3 +159,7 @@ for doc in os.scandir(docs_path):
     
 
 model.serialize(destination=rdf_path, format='turtle')
+model2=Graph()
+model2.parse("schema.ttl", format='turtle')
+model2 += model
+model2.serialize(destination="complete.ttl", format='turtle')
