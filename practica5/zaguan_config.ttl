@@ -5,10 +5,9 @@ PREFIX fuseki:  <http://jena.apache.org/fuseki#>
 PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ja:      <http://jena.hpl.hp.com/2005/11/Assembler#>
-PREFIX dc:      <http://purl.org/dc/elements/1.1/>
-PREFIX foaf:    <http://xmlns.com/foaf/0.1/> 
 PREFIX tdb2:    <http://jena.apache.org/2016/tdb#>
 PREFIX text:    <http://jena.apache.org/text#>
+PREFIX mi:      <http://miuri/xd#>
 
 [] rdf:type fuseki:Server ;
    fuseki:services (
@@ -74,8 +73,18 @@ PREFIX text:    <http://jena.apache.org/text#>
     text:defaultField     "title" ;
     ## Enable deleting of text index entries.
     text:uidField         "uid" ;
-    text:map (          
-         [ text:field "title" ; text:predicate dc:title ]
-         [ text:field "creator" ; text:predicate foaf:name ]
-         )
+    text:map (
+        [ text:field "hasAuthor" ; text:predicate mi:hasAuthor ]
+        [ text:field "title" ; text:predicate mi:title ]
+        [ text:field "year" ; text:predicate mi:year ]
+        [ text:field "subject" ; text:predicate mi:subject ]
+        [ text:field "license" ; text:predicate mi:license ]
+        [ text:field "contributor" ; text:predicate mi:contributor ]
+        [ text:field "description" ; text:predicate mi:description ]
+        [ text:field "language" ; text:predicate mi:language ]
+        [ text:field "relation" ; text:predicate mi:relation ]
+        [ text:field "namePersona" ; text:predicate mi:namePersona ]
+        [ text:field "publisher" ; text:predicate mi:namePublisher ]
+        [ text:field "subject" ; text:predicate mi:subject ]
+        )
     .

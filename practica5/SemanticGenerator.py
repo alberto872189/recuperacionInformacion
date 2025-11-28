@@ -6,6 +6,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 import xml.etree.ElementTree as ET
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import RDFS, RDF, XSD, Namespace
+from owlrl import DeductiveClosure, OWLRL_Semantics
 
 from re import sub
 import unicodedata, re
@@ -162,4 +163,6 @@ model.serialize(destination=rdf_path, format='turtle')
 model2=Graph()
 model2.parse("schema.ttl", format='turtle')
 model2 += model
+# Aplica OWL-RL (modifica g añadiendo triples inferidos)
+DeductiveClosure(OWLRL_Semantics).expand(model2)
 model2.serialize(destination="complete.ttl", format='turtle')
