@@ -35,15 +35,14 @@ DATASET_NAME = 'datasetExample3'
 ADMIN_USER = 'admin'
 ADMIN_PASS = 'admin'
 ENDPOINT = f'{FUSEKI_HOST}/{DATASET_NAME}/sparql'
-BASE_URI = 'http://miuri/xd/'
-BASE_URI_ACADEMICWORK = 'http://miuri/xd/AcademicWork/'
-BASE_URI_TFG = 'http://miuri/xd/TFG/'
-BASE_URI_TFM = 'http://miuri/xd/TFM/'
-BASE_URI_TESIS = 'http://miuri/xd/Tesis/'
-BASE_URI_PERSONA = 'http://miuri/xd/Persona/'
-BASE_URI_SUBJECT = 'http://miuri/xd/Subject/'
-BASE_URI_PUBLISHER = 'http://miuri/xd/Publisher/'
-
+BASE_URI = 'http://miuri/xd#'
+BASE_URI_ACADEMICWORK = 'http://miuri/xd#AcademicWork'
+BASE_URI_TFG = 'http://miuri/xd#TFG'
+BASE_URI_TFM = 'http://miuri/xd#TFM'
+BASE_URI_TESIS = 'http://miuri/xd#Tesis'
+BASE_URI_PERSONA = 'http://miuri/xd#Persona'
+BASE_URI_SUBJECT = 'http://miuri/xd#Subject'
+BASE_URI_PUBLISHER = 'http://miuri/xd#Publisher'
 rdf_path = './zaguan.ttl'
 docs_path = '../recordsdc'
 
@@ -121,26 +120,28 @@ for doc in os.scandir(docs_path):
 
 
     base_doc_uri = BASE_URI_TFG if doc_type == 'TAZ-TFG' else BASE_URI_TFM if doc_type == 'TAZ-TFM' else BASE_URI_TESIS if doc_type == 'TESIS' else BASE_URI_ACADEMICWORK
-    doc_uri = URIRef(identifier)
+    clean_id = identifier.strip().replace("\n", "").replace("\r", "")
+    doc_uri = URIRef(clean_id)
     model.add((doc_uri, RDF.type, URIRef(base_doc_uri)))
+    model.add((doc_uri, RDF.type, URIRef(BASE_URI_ACADEMICWORK)))
 
     for c in creator:
-        creator_uri = URIRef(BASE_URI_PERSONA + camel_case(c))
+        creator_uri = URIRef(BASE_URI_PERSONA+'/' + camel_case(c))
         model.add((creator_uri, RDF.type, URIRef(BASE_URI_PERSONA)))
         model.add((creator_uri, URIRef(BASE_URI + "namePersona"), Literal(c)))
-        model.add((doc_uri, URIRef(BASE_URI + "creator"), creator_uri))
+        model.add((doc_uri, URIRef(BASE_URI + "hasAuthor"), creator_uri))
     for c in contributor:
-        contributor_uri = URIRef(BASE_URI_PERSONA + camel_case(c))
+        contributor_uri = URIRef(BASE_URI_PERSONA+'/' + camel_case(c))
         model.add((contributor_uri, RDF.type, URIRef(BASE_URI_PERSONA)))
         model.add((contributor_uri, URIRef(BASE_URI + "namePersona"), Literal(c)))
         model.add((doc_uri, URIRef(BASE_URI + "contributor"), contributor_uri))
     for p in publisher:
-        publisher_uri = URIRef(BASE_URI_PUBLISHER + camel_case(p))
+        publisher_uri = URIRef(BASE_URI_PUBLISHER + '/' + camel_case(p))
         model.add((publisher_uri, RDF.type, URIRef(BASE_URI_PUBLISHER)))
         model.add((publisher_uri, URIRef(BASE_URI + "namePublisher"), Literal(p)))
         model.add((doc_uri, URIRef(BASE_URI + "publisher"), publisher_uri))
     for subj in subject:
-        subject_uri = URIRef(BASE_URI_SUBJECT + camel_case(subj))
+        subject_uri = URIRef(BASE_URI_SUBJECT + '/' + camel_case(subj))
         model.add((doc_uri, URIRef(BASE_URI + "subject"), subject_uri))
 
     
@@ -148,15 +149,19 @@ for doc in os.scandir(docs_path):
     for t in title:
         model.add((doc_uri, URIRef(BASE_URI + "title"), Literal(t)))
     for d in date:
-        model.add((doc_uri, URIRef(BASE_URI + "date"), Literal(d, datatype=XSD.gYear)))
+        model.add((doc_uri, URIRef(BASE_URI + "year"), Literal(d, datatype=XSD.gYear)))
     for d in description:
         model.add((doc_uri, URIRef(BASE_URI + "description"), Literal(d)))
     for l in language:
         model.add((doc_uri, URIRef(BASE_URI + "language"), Literal(l, datatype=XSD.language)))
     for r in relation:
-        model.add((doc_uri, URIRef(BASE_URI + "relation"), Literal(r, datatype=XSD.anyURI)))
+        clean_r = r.strip().replace("\n", "").replace("\r", "")
+        model.add((doc_uri, URIRef(BASE_URI + "relation"), URIRef(clean_r)))
     for rt in rights:
-        model.add((doc_uri, URIRef(BASE_URI + "license"), Literal(rt, datatype=XSD.anyURI)))
+        clean_rt = rt.strip().replace("\n", "").replace("\r", "")
+        model.add((doc_uri, URIRef(BASE_URI + "license"), URIRef(clean_rt)))
+
+
     
 
 model.serialize(destination=rdf_path, format='turtle')
@@ -164,5 +169,5 @@ model2=Graph()
 model2.parse("schema.ttl", format='turtle')
 model2 += model
 # Aplica OWL-RL (modifica g añadiendo triples inferidos)
-DeductiveClosure(OWLRL_Semantics).expand(model2)
+#DeductiveClosure(OWLRL_Semantics).expand(model)
 model2.serialize(destination="complete.ttl", format='turtle')

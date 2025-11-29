@@ -65,7 +65,7 @@ if __name__ == '__main__':
         sparql.setQuery(query)
         sparql.setReturnFormat(JSON)
         results = sparql.query().convert()
-        #print(results)
-        printResults(id, results, output)
+        print(results)
+        #printResults(id, results, output)
     if output:
         output.close()
