@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><informationNeeds>
+        <informationNeed>
+                <identifier>101-4</identifier>
+                <text><![CDATA[PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT * WHERE {
+  ?sub ?pred ?obj .
+} LIMIT 100
+]]></text>
+        </informationNeed>
+        <informationNeed>
+                <identifier>101-4</identifier>
+                <text><![CDATA[PREFIX mi: <http://miuri/xd#>
+PREFIX text: <http://jena.apache.org/text#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?work ?title ?year ?lang ?score WHERE {
+    ?work a mi:AcademicWork .
+    OPTIONAL { ?work mi:title ?title. }
+    OPTIONAL { ?work mi:description ?description. }
+    OPTIONAL { ?work mi:year ?year. }
+    OPTIONAL { ?work mi:language ?lang. }
+
+    # Busca por términos relevantes usando el índice Lucene
+    ?work text:query ("animaci* OR \"vision por computador\"" ).
+    ?work text:score ?score .
+
+    FILTER ( 
+        (BOUND(?year) && ?year >= "2005"^^xsd:gYear) &&
+        (BOUND(?lang) && regex(str(?lang), "^spa", "i") )
+    )
+}
+ORDER BY DESC(?score)
+LIMIT 100
+]]></text>
+        </informationNeed>
+        <informationNeed>
+                <identifier>106-4</identifier>
+                <text><![CDATA[PREFIX mi: <http://miuri/xd#>
+PREFIX text: <http://jena.apache.org/text#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?work ?title ?year ?score WHERE {
+    ?work a mi:AcademicWork .
+    OPTIONAL { ?work mi:title ?title. }
+    OPTIONAL { ?work mi:description ?description. }
+    OPTIONAL { ?work mi:year ?year. }
+
+    ?work text:query ("veterin* AND (gato OR felin* OR perro OR canin*)" ).
+    ?work text:score ?score .
+
+    FILTER (BOUND(?year) && ?year >= "2012"^^xsd:gYear && ?year <= "2018"^^xsd:gYear)
+}
+ORDER BY DESC(?score)
+LIMIT 100
+]]></text>
+        </informationNeed>
+        <informationNeed>
+                <identifier>206-4</identifier>
+                <text><![CDATA[PREFIX mi: <http://miuri/xd#>
+PREFIX text: <http://jena.apache.org/text#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT DISTINCT ?work ?title ?authorName ?score WHERE {
+    ?work a mi:AcademicWork .
+    OPTIONAL { ?work mi:title ?title. }
+    OPTIONAL { ?work mi:hasAuthor ?author. ?author mi:namePersona ?authorName. }
+    OPTIONAL { ?work mi:contributor ?contrib . ?contrib mi:namePersona ?contribName. }
+
+    # Filtrar por apellido López en autor/director
+    FILTER (
+        (BOUND(?authorName) && regex(?authorName, "L[oó]pez", "i")) ||
+        (BOUND(?contribName) && regex(?contribName, "L[oó]pez", "i"))
+    )
+
+    # Ordenar por relevancia en torno a informática (consulta lucene)
+    ?work text:query ("informatic* OR \"departamento de informatica\"" ).
+    ?work text:score ?score .
+
+    OPTIONAL { ?work mi:description ?description. }
+    FILTER ( !BOUND(?description) || regex(?description, "inform[áa]tica|departamento de inform[áa]tica", "i") )
+}
+ORDER BY DESC(?score)
+LIMIT 100
+]]></text>
+        </informationNeed>
+        <informationNeed>
+                <identifier>209-2</identifier>
+                <text><![CDATA[PREFIX mi: <http://miuri/xd#>
+PREFIX text: <http://jena.apache.org/text#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?work ?title ?year ?score WHERE {
+    ?work a mi:AcademicWork .
+    OPTIONAL { ?work mi:title ?title. }
+    OPTIONAL { ?work mi:description ?description. }
+    OPTIONAL { ?work mi:year ?year. }
+
+    ?work text:query ("arte AND (aragón OR aragones OR aragonés)" ).
+    ?work text:score ?score .
+
+    FILTER ( !BOUND(?year) || ?year <= "1900"^^xsd:gYear )
+}
+ORDER BY DESC(?score) DESC(?year)
+LIMIT 100
+]]></text>
+        </informationNeed>
+        <informationNeed>
+                <identifier>305-4</identifier>
+                <text><![CDATA[PREFIX mi: <http://miuri/xd#>
+PREFIX text: <http://jena.apache.org/text#>
+
+SELECT ?work ?title ?score WHERE {
+    ?work a mi:AcademicWork .
+    OPTIONAL { ?work mi:title ?title. }
+    OPTIONAL { ?work mi:description ?description. }
+
+    ?work text:query ("(algorit* OR busc* OR secuenc* OR proteina OR protein* OR paciente OR sintom*) AND (medicin* OR salud)").
+    ?work text:score ?score .
+
+}
+ORDER BY DESC(?score) ?title
+LIMIT 100
+]]></text>
+        </informationNeed>
+</informationNeeds>
