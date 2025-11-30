@@ -85,6 +85,5 @@ PREFIX mi:      <http://miuri/xd#>
         [ text:field "relation" ; text:predicate mi:relation ]
         [ text:field "namePersona" ; text:predicate mi:namePersona ]
         [ text:field "publisher" ; text:predicate mi:namePublisher ]
-        [ text:field "subject" ; text:predicate mi:subject ]
         )
     .

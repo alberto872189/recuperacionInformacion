@@ -1,29 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?><informationNeeds>
         <informationNeed>
                 <identifier>101-4</identifier>
-                <text><![CDATA[PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT * WHERE {
-  ?sub ?pred ?obj .
-} LIMIT 100
-]]></text>
-        </informationNeed>
-        <informationNeed>
-                <identifier>101-4</identifier>
                 <text><![CDATA[PREFIX mi: <http://miuri/xd#>
 PREFIX text: <http://jena.apache.org/text#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?work ?title ?year ?lang ?score WHERE {
-    ?work a mi:AcademicWork .
-    OPTIONAL { ?work mi:title ?title. }
-    OPTIONAL { ?work mi:description ?description. }
+SELECT DISTINCT ?work ?score WHERE {
+    VALUES ?t { mi:TFG mi:TFM }
+    ?work a ?t .
     OPTIONAL { ?work mi:year ?year. }
     OPTIONAL { ?work mi:language ?lang. }
 
     # Busca por términos relevantes usando el índice Lucene
-    ?work text:query ("animaci* OR \"vision por computador\"" ).
-    ?work text:score ?score .
+    (?work ?score) text:query ("animaci* OR (vision* AND comput*)").
 
     FILTER ( 
         (BOUND(?year) && ?year >= "2005"^^xsd:gYear) &&
@@ -40,14 +29,10 @@ LIMIT 100
 PREFIX text: <http://jena.apache.org/text#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?work ?title ?year ?score WHERE {
-    ?work a mi:AcademicWork .
-    OPTIONAL { ?work mi:title ?title. }
-    OPTIONAL { ?work mi:description ?description. }
+SELECT DISTINCT ?work ?score WHERE {
     OPTIONAL { ?work mi:year ?year. }
 
-    ?work text:query ("veterin* AND (gato OR felin* OR perro OR canin*)" ).
-    ?work text:score ?score .
+    (?work ?score) text:query ("veterin* AND (gato OR felin* OR perro OR canin*)" ).
 
     FILTER (BOUND(?year) && ?year >= "2012"^^xsd:gYear && ?year <= "2018"^^xsd:gYear)
 }
@@ -62,7 +47,9 @@ PREFIX text: <http://jena.apache.org/text#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 SELECT DISTINCT ?work ?title ?authorName ?score WHERE {
-    ?work a mi:AcademicWork .
+    VALUES ?t { mi:TFG mi:TFM }
+    ?work a ?t .
+    ?work mi:publisher ?dept .
     OPTIONAL { ?work mi:title ?title. }
     OPTIONAL { ?work mi:hasAuthor ?author. ?author mi:namePersona ?authorName. }
     OPTIONAL { ?work mi:contributor ?contrib . ?contrib mi:namePersona ?contribName. }
@@ -74,8 +61,7 @@ SELECT DISTINCT ?work ?title ?authorName ?score WHERE {
     )
 
     # Ordenar por relevancia en torno a informática (consulta lucene)
-    ?work text:query ("informatic* OR \"departamento de informatica\"" ).
-    ?work text:score ?score .
+    (?dept ?score) text:query ("informatic* OR \"departamento de informatica\"" ).
 
     OPTIONAL { ?work mi:description ?description. }
     FILTER ( !BOUND(?description) || regex(?description, "inform[áa]tica|departamento de inform[áa]tica", "i") )
@@ -90,18 +76,12 @@ LIMIT 100
 PREFIX text: <http://jena.apache.org/text#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?work ?title ?year ?score WHERE {
+SELECT DISTINCT ?work ?score WHERE {
     ?work a mi:AcademicWork .
-    OPTIONAL { ?work mi:title ?title. }
-    OPTIONAL { ?work mi:description ?description. }
-    OPTIONAL { ?work mi:year ?year. }
 
-    ?work text:query ("arte AND (aragón OR aragones OR aragonés)" ).
-    ?work text:score ?score .
-
-    FILTER ( !BOUND(?year) || ?year <= "1900"^^xsd:gYear )
+    (?work ?score) text:query ("arte OR (aragón OR aragones OR aragonés) AND NOT XXI AND NOT [2000 TO 2030] " ).
 }
-ORDER BY DESC(?score) DESC(?year)
+ORDER BY DESC(?score)
 LIMIT 100
 ]]></text>
         </informationNeed>
@@ -110,16 +90,13 @@ LIMIT 100
                 <text><![CDATA[PREFIX mi: <http://miuri/xd#>
 PREFIX text: <http://jena.apache.org/text#>
 
-SELECT ?work ?title ?score WHERE {
+SELECT DISTINCT ?work ?score WHERE {
     ?work a mi:AcademicWork .
-    OPTIONAL { ?work mi:title ?title. }
-    OPTIONAL { ?work mi:description ?description. }
 
-    ?work text:query ("(algorit* OR busc* OR secuenc* OR proteina OR protein* OR paciente OR sintom*) AND (medicin* OR salud)").
-    ?work text:score ?score .
+    (?work ?score) text:query ("(algorit* OR busc* OR secuenc* OR proteina OR protein* OR paciente OR sintom*) AND (medicin* OR salud)").
 
 }
-ORDER BY DESC(?score) ?title
+ORDER BY DESC(?score)
 LIMIT 100
 ]]></text>
         </informationNeed>
