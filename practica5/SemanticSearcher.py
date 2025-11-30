@@ -17,13 +17,8 @@ ENDPOINT = f'{FUSEKI_HOST}/{DATASET_NAME}/sparql'
 # Método de impresión de resultados por pantalla, usado por varias consultas
 def printResults(id, results, output):
     for result in results["results"]["bindings"]:
-        print(f"{id} - {result['x']['value']} - "
-            f"Name score: {result.get('score1', {}).get('value', '0')} - "
-            f"Desc score: {result.get('score2', {}).get('value', '0')} - "
-            f"Total: {result['scoretot']['value']}", file=output)
-
-
-
+        print(f"{id}\t{result['work']['value']}", file=output)
+    
 # ------------------------------------------------------
 # Función main que realiza diferentes tipos de consultas de texto
 # ------------------------------------------------------
@@ -65,7 +60,7 @@ if __name__ == '__main__':
         sparql.setQuery(query)
         sparql.setReturnFormat(JSON)
         results = sparql.query().convert()
-        print(results)
-        #printResults(id, results, output)
+        #print(results)
+        printResults(id, results, output)
     if output:
         output.close()

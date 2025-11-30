@@ -46,11 +46,10 @@ LIMIT 100
 PREFIX text: <http://jena.apache.org/text#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT DISTINCT ?work ?title ?authorName ?score WHERE {
+SELECT DISTINCT ?work WHERE {
     VALUES ?t { mi:TFG mi:TFM }
     ?work a ?t .
     ?work mi:publisher ?dept .
-    OPTIONAL { ?work mi:title ?title. }
     OPTIONAL { ?work mi:hasAuthor ?author. ?author mi:namePersona ?authorName. }
     OPTIONAL { ?work mi:contributor ?contrib . ?contrib mi:namePersona ?contribName. }
 
@@ -59,14 +58,16 @@ SELECT DISTINCT ?work ?title ?authorName ?score WHERE {
         (BOUND(?authorName) && regex(?authorName, "L[oó]pez", "i")) ||
         (BOUND(?contribName) && regex(?contribName, "L[oó]pez", "i"))
     )
+  	
+  	FILTER (?dept IN (
+      <http://miuri/xd#Publisher/universidadDeZaragozaDepartamentoDeInformaticaEIngenieriaDeSistemas>,
+      <http://miuri/xd#Publisher/universidadDeZaragozaDepartamentoDeInformaticaEIngenieriaDeSistemasAreaDeArquitecturaYTecnologiaDeComputadores>,
+      <http://miuri/xd#Publisher/universidadDeZaragozaDepartamentoDeInformaticaEIngenieriaDeSistemasAreaDeCcDeLaComputacionEInteligenciaArtificial>,
+      <http://miuri/xd#Publisher/universidadDeZaragozaDepartamentoDeInformaticaEIngenieriaDeSistemasAreaDeIngenieriaDeSistemasYAutomatica>,
+      <http://miuri/xd#Publisher/universidadDeZaragozaDepartamentoDeInformaticaEIngenieriaDeSistemasAreaDeLenguajesYSistemasInformaticos>
+	))
 
-    # Ordenar por relevancia en torno a informática (consulta lucene)
-    (?dept ?score) text:query ("informatic* OR \"departamento de informatica\"" ).
-
-    OPTIONAL { ?work mi:description ?description. }
-    FILTER ( !BOUND(?description) || regex(?description, "inform[áa]tica|departamento de inform[áa]tica", "i") )
 }
-ORDER BY DESC(?score)
 LIMIT 100
 ]]></text>
         </informationNeed>
