@@ -94,11 +94,11 @@ PREFIX text: <http://jena.apache.org/text#>
 SELECT DISTINCT ?work ?score WHERE {
     ?work a mi:AcademicWork .
 
-    (?work ?score) text:query ("(algorit* OR busc* OR secuenc* OR proteina OR protein* OR paciente OR sintom*) AND (medicin* OR salud)").
+    (?work ?score) text:query ("(title:(algorit*) OR description:(algorit*)) AND (title:(busc* OR secuenc* OR protein* OR paciente OR sintom* OR medicin* OR salud) OR description:(busc* OR secuenc* OR protein* OR paciente OR sintom* OR medicin* OR salud))").
 
 }
 ORDER BY DESC(?score)
-LIMIT 100
+LIMIT 100  
 ]]></text>
         </informationNeed>
 </informationNeeds>

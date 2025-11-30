@@ -144,14 +144,17 @@ interpolated_recall_precision
 1.000 0.000
 
 INFORMATION NEED 305-4
-precision 0.000
-recall 0.000
-F1 0.000
-prec@10 0.000
-average_precision 0.000
+precision 0.060
+recall 0.055
+F1 0.057
+prec@10 0.100
+average_precision 0.167
 recall_precision
+0.018 0.333
+0.036 0.087
+0.055 0.081
 interpolated_recall_precision
-0.000 0.000
+0.000 0.333
 0.100 0.000
 0.200 0.000
 0.300 0.000
@@ -164,13 +167,13 @@ interpolated_recall_precision
 1.000 0.000
 
 TOTAL
-precision 0.490
-recall 0.172
-F1 0.255
-prec@10 0.560
-MAP 0.623
+precision 0.502
+recall 0.183
+F1 0.268
+prec@10 0.580
+MAP 0.657
 interpolated_recall_precision
-0.000 0.800
+0.000 0.867
 0.100 0.292
 0.200 0.192
 0.300 0.186
