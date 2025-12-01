@@ -6,7 +6,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 import xml.etree.ElementTree as ET
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import RDFS, RDF, XSD, Namespace
-from owlrl import DeductiveClosure, OWLRL_Semantics
+#from owlrl import DeductiveClosure, OWLRL_Semantics
 
 from re import sub
 import unicodedata, re
@@ -29,12 +29,6 @@ def camel_case(s):
     s = re.sub(r'[^A-Za-z0-9]', '', s)
     return s
 
-# Configuración del servicio FUSEKI
-FUSEKI_HOST = 'http://localhost:3030'
-DATASET_NAME = 'datasetExample3'
-ADMIN_USER = 'admin'
-ADMIN_PASS = 'admin'
-ENDPOINT = f'{FUSEKI_HOST}/{DATASET_NAME}/sparql'
 BASE_URI = 'http://miuri/xd#'
 BASE_URI_ACADEMICWORK = 'http://miuri/xd#AcademicWork'
 BASE_URI_TFG = 'http://miuri/xd#TFG'
@@ -164,10 +158,10 @@ for doc in os.scandir(docs_path):
 
     
 
-model.serialize(destination=rdf_path, format='turtle')
+model.serialize(destination="coleccion.ttl", format='turtle')
 model2=Graph()
-model2.parse("schema.ttl", format='turtle')
+model2.parse("esquema.ttl", format='turtle')
 model2 += model
-# Aplica OWL-RL (modifica g añadiendo triples inferidos)
-#DeductiveClosure(OWLRL_Semantics).expand(model)
-model2.serialize(destination="complete.ttl", format='turtle')
+# Aplica OWL-RL (modifica model2 añadiendo triples inferidos)
+#DeductiveClosure(OWLRL_Semantics).expand(model2)
+model2.serialize(destination=rdf_path, format='turtle')
