@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><informationNeeds>
+        <informationNeed>
+                <identifier>101-4</identifier>
+                <text><![CDATA[
+content:("TAZ-TFG" OR "TAZ-TFM")
+AND content:spa
+AND content:[2005 TO *]
+AND content:(animaci* OR (vision* AND comput*))
+]]></text>
+        </informationNeed>
+        <informationNeed>
+                <identifier>106-4</identifier>
+                <text><![CDATA[
+content:[2012 TO 2018]
+AND content:(veterin* AND (gato OR felin* OR perro OR canin*))
+]]>
+</text>
+        </informationNeed>
+        <informationNeed>
+                <identifier>206-4</identifier>
+                <text><![CDATA[
+content:("TAZ-TFG" OR "TAZ-TFM")
+AND content:(López)
+AND content:(Informática)
+]]></text>
+        </informationNeed>
+        <informationNeed>
+                <identifier>209-2</identifier>
+                <text><![CDATA[
+content:(arte AND (aragón OR aragones OR aragonés))
+AND NOT content:(XXI)
+]]></text>
+        </informationNeed>
+        <informationNeed>
+                <identifier>305-4</identifier>
+                <text><![CDATA[
+content:((algorit*) AND (busc* OR secuenc* OR protein* OR paciente OR sintom* OR medicin* OR salud))
+]]></text>
+        </informationNeed>
+</informationNeeds>
